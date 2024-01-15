@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "ugr-server"
+version = "0.1.0"
+description = ""
+authors = ["mkozica <matej.split@gmail.com>"]
+packages = [
+    { include = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = {extras = ["jinja2"], version = "^0.104.1"}
+uvicorn = "^0.23.2"
+requests = "^2.31.0"
+aiopg = "^1.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

@@ -1,0 +1,39 @@
+version: "3"
+
+volumes:
+  database:
+
+networks:
+  ugr:
+    name: ugr_network
+
+services:
+  ugr_project_db:
+    container_name: ugr_project_db
+    image: postgres
+    environment:
+      POSTGRES_DB: ugr_project
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: changeme
+    ports:
+      - "5432:5432"
+    logging:
+      driver: none
+    volumes:
+      - database:/var/lib/postgresql/data  
+
+  ugr_project_api:
+    container_name: ugr_project_api
+    build:
+      context: .
+    tty: true
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    command: "/app/entrypoint.sh api_dev"
+    ports:
+      - "8000:8000"
+    networks:
+      - ugr
+  
