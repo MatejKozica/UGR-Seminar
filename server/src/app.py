@@ -8,6 +8,10 @@ from src.database.db_connection import conn
 
 app = FastAPI()
 
+class Connection(BaseModel):
+    name: str
+    mac_address: str
+
 origins = ['http://localhost']
 
 app.add_middleware(
@@ -24,9 +28,9 @@ async def startup():
     async with conn.cursor() as cursor:
         q = """
             CREATE TABLE IF NOT EXISTS connections(
-                id serial primary key
-                mac_address macaddr
-                name text
+                id serial primary key,
+                name text,
+                mac_address macaddr,
                 connection_time timestamp DEFAULT current_timestamp
             )
         """
@@ -36,12 +40,12 @@ async def startup():
 
 @app.get("/connections")
 async def getConnections():
-    results = db_get_connections()
+    results = await db_get_connections()
     return {"code": 200, "data": results}
 
 @app.post("/connect")
-async def saveBluetoothConnection(macAddress, name):
-    results = await db_create_connection({macAddress, name})
+async def saveBluetoothConnection(connection: Connection):
+    results = await db_create_connection(connection)
     return {"code": 200, "data": results}
 
 

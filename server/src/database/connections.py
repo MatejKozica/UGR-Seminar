@@ -4,14 +4,14 @@ async def db_get_connections():
     async with conn.cursor() as cursor:
         q = """
         SELECT * FROM connections
-        ORDER BY connection_time
+        ORDER BY id
         """
 
         await cursor.execute(q)
         results = await cursor.fetchall()
         return [dict(item) for item in results]
     
-async def db_create_connection(mac_address, name):
+async def db_create_connection(connection):
     async with conn.cursor() as cursor:
         q = f"""
             INSERT INTO connections(mac_address,name)
@@ -19,5 +19,5 @@ async def db_create_connection(mac_address, name):
             RETURNING *
         """
 
-        await cursor.execute(q, (mac_address, name))
+        await cursor.execute(q, (connection.mac_address, connection.name))
         return await cursor.fetchone()

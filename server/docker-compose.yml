@@ -21,6 +21,8 @@ services:
       driver: none
     volumes:
       - database:/var/lib/postgresql/data  
+    networks:
+      - ugr
 
   ugr_project_api:
     container_name: ugr_project_api
