@@ -14,10 +14,10 @@ async def db_get_connections():
 async def db_create_connection(connection):
     async with conn.cursor() as cursor:
         q = f"""
-            INSERT INTO connections(mac_address,name)
+            INSERT INTO connections(university_identification_number,name)
             VALUES (%s, %s)
             RETURNING *
         """
 
-        await cursor.execute(q, (connection.mac_address, connection.name))
+        await cursor.execute(q, (connection["university_identification_number"], connection["name"]))
         return await cursor.fetchone()

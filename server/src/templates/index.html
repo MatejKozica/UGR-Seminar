@@ -1,0 +1,23 @@
+<html>
+<head>
+    <title>Bluetooth connections</title>
+</head>
+<body>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Ime</th>
+            <th>Maticni broj</th>
+            <th>Vrijeme</th>
+        </tr>
+        {% for item in items}
+        <tr>
+            <td>{{item.id}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.university_identification_number}}</td>
+            <td>{{item.connection_time}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
