@@ -5,24 +5,32 @@
 int CONNECTED = 00;
 int CONNECTION_FAILED = 01;
 int ALREADY_CONNECTED = 02;
+std::vector<std::string> values;      
+NimBLEService *pService;
+std::string characteristic_uuid = "aac111b6-9d28-4785-98b4-d6c872de03d5";
 
-int getData(void) {
+
+int postData(std::string value) {
   HTTPClient http;
 
   // Specify the URL of the API endpoint
-  http.begin("https://api.chucknorris.io/jokes/random");
+  http.begin("http://192.168.123.233:8000/connect");
+  http.setAuthorization("admin", "changeme");
 
+  String payload = "{\"value\": \"" + String(value.c_str()) + "\"}";
+
+  Serial.println(payload);
   // Send GET request
-  int httpResponseCode = http.GET();
+  int httpResponseCode = http.POST(payload);
 
   if (httpResponseCode > 0) {
     Serial.print("HTTP Response Code: ");
     Serial.println(httpResponseCode);
 
     // Read the response
-    String payload = http.getString();
-    Serial.print("Response payload:");
-    Serial.println(payload);
+    String content = http.getString();
+    Serial.print("Response content:");
+    Serial.println(content);
   } else {
     Serial.print("HTTP Request failed. Error code: ");
     Serial.println(httpResponseCode);
@@ -37,23 +45,16 @@ int getData(void) {
 class DataCallbacks : public NimBLECharacteristicCallbacks {
   void onWrite(NimBLECharacteristic *pCharacteristic) {
     std::string value = pCharacteristic->getValue();
-
-    // client is sending username and password combination which is separated by space
-    Serial.print("Value received from client: ");
-    Serial.println(value.c_str());
-
-    getData();
-
-    // set value to characteristic so client can read it
-    pCharacteristic->setValue(ALREADY_CONNECTED);
+    values.push_back(value);
   }
   void onRead(NimBLECharacteristic *pCharacteristic) {
+    Serial.println(pCharacteristic->getValue().c_str());
   }
 };
 
 void connectToWifi(void) {
-  const char *ssid = "Xiaomi 12T";
-  const char *password = "tometomic";
+  const char *ssid = "Galaxy";
+  const char *password = "ae310gyrz1";
   
   // start connecting
   WiFi.begin(ssid, password);
@@ -70,15 +71,15 @@ void initiateBLEServer(void) {
   NimBLEDevice::init("NimBLE");
 
   NimBLEServer *pServer = NimBLEDevice::createServer();
-  NimBLEService *pService = pServer->createService("aac111b6-9d28-4785-98b4-d6c872de03d5");
+  pService = pServer->createService(characteristic_uuid);
 
   // Create a writable characteristic
-  NimBLECharacteristic *writeCharacteristic = pService->createCharacteristic(
-      "aac111b6-9d28-4785-98b4-d6c872de03d5",
+  NimBLECharacteristic *serviceCharacteristic = pService->createCharacteristic(
+      characteristic_uuid,
       NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::READ
   );
   
-  writeCharacteristic->setCallbacks(new DataCallbacks());
+  serviceCharacteristic->setCallbacks(new DataCallbacks());
   
   pService->start();
     
@@ -97,5 +98,12 @@ void setup(void) {
 }
 
 void loop() {
+  for (int i = 0; i < values.size(); i++) {
+    postData(values[i]);
+    NimBLECharacteristic *charact = pService->getCharacteristic(characteristic_uuid);
+    charact->setValue(CONNECTED);
+    values.erase(values.begin() + i);
+  }
   delay(2000);
 }
+
