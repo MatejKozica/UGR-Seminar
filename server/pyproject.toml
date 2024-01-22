@@ -9,11 +9,11 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-fastapi = {extras = ["jinja2"], version = "^0.104.1"}
 uvicorn = "^0.23.2"
 requests = "^2.31.0"
 aiopg = "^1.4.0"
-
+fastapi = {version="^0.109.0", extras=["all"]}
+jinja2 = "^3.1.3"
 
 [build-system]
 requires = ["poetry-core"]

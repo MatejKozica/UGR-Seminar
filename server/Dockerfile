@@ -11,8 +11,9 @@ RUN apt-get update && apt-get install curl git -y && \
     # Install barebones instead of in virtualenv
     poetry config virtualenvs.create false && \
     # Install deps
-    poetry install && \
+    poetry install --no-root --all-extras
 
 COPY . /app
+RUN poetry install
 
 EXPOSE 8000
