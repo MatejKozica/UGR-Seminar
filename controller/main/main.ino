@@ -14,7 +14,7 @@ int postData(std::string value) {
   HTTPClient http;
 
   // Specify the URL of the API endpoint
-  http.begin("http://192.168.123.233:8000/connect");
+  http.begin("http://192.168.47.196:8000/connect");
   http.setAuthorization("admin", "changeme");
 
   String payload = "{\"value\": \"" + String(value.c_str()) + "\"}";
@@ -99,9 +99,13 @@ void setup(void) {
 
 void loop() {
   for (int i = 0; i < values.size(); i++) {
-    postData(values[i]);
+    int httpResponseCode = postData(values[i]);
     NimBLECharacteristic *charact = pService->getCharacteristic(characteristic_uuid);
-    charact->setValue(CONNECTED);
+    if (httpResponseCode < 0) {
+      charact->setValue(CONNECTION_FAILED);
+    } else {
+      charact->setValue(CONNECTED);
+    }
     values.erase(values.begin() + i);
   }
   delay(2000);
