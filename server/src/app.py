@@ -25,6 +25,7 @@ users = {
 
 
 def verification(creds: HTTPBasicCredentials = Depends(security)):
+    print()
     username = creds.username
     password = creds.password
     if username in users and password == users[username]["password"]:
@@ -87,15 +88,16 @@ async def save_bluetooth_connection(connection: Connection, Verification = Depen
 
 
 @app.get("/records")
-async def get_records(request: Request):
+async def get_records(request: Request, Verification = Depends(verification)):
     results = await db_get_connections()
     return templates.TemplateResponse(
         request=request, name="table.html", context={"items": results or []}
     )
 
 @app.delete("/remove/{record_id}")
-async def delete_record(record_id: int):
-    await remove_record(record_id);
+async def delete_record(record_id: int, Verification = Depends(verification)):
+    await remove_record(record_id)
+
     return 200
 
 
